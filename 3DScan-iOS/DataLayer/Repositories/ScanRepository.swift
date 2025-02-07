@@ -19,7 +19,7 @@ class ScanRepository: ScanRepositoryProtocol {
     }
 
     func uploadScan(userId: String, scanFile: Data, fileName: String) async throws -> String {
-        let response = try await apiService.uploadScan(userId: userId, scanFile: scanFile, fileName: fileName)
+        let response = try await apiService.request(.uploadScan(userId: userId, scanFile: scanFile, fileName: fileName))
         let json = try JSONDecoder().decode([String: String].self, from: response.data)
         return json["scanUrl"] ?? ""
     }

@@ -32,9 +32,4 @@ class APIService {
             }
         }
     }
-
-    
-    func uploadScan(userId: String, scanFile: Data, fileName: String) async throws -> Response {
-        return try await request(.uploadScan(userId: userId, scanFile: scanFile, fileName: fileName))
-    }
 }

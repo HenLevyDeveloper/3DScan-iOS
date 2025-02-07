@@ -10,32 +10,37 @@ import Foundation
 @MainActor
 class HomeViewModel: ObservableObject {
     @Published var solutions = [ProductSolution]()
-    @Published var isLoadingSolutions = false
-    @Published var errorMessageSolutions: String?
+    @Published var bodyParts = [BodyPart]()
     
     private let productsUseCase: ProductsUseCaseProtocol
-    private init(productsUseCase: ProductsUseCaseProtocol) {
+    private let bodyPartsUseCase: BodyPartsUseCaseProtocol
+    
+    private init(productsUseCase: ProductsUseCaseProtocol,
+                 bodyPartsUseCase: BodyPartsUseCaseProtocol) {
         self.productsUseCase = productsUseCase
+        self.bodyPartsUseCase = bodyPartsUseCase
     }
 
     /// factory method for safe initialization
     static func create() -> HomeViewModel {
-        let apiService = APIService()
-        let repository = ProductsRepository(apiService: apiService)
-        let useCase = ProductsUseCase(repository: repository)
-        return HomeViewModel(productsUseCase: useCase)
+        let productsUseCase = ProductsUseCase(repository: ProductsRepository(apiService: APIService()))
+        let bodyPartsUseCase = BodyPartsUseCase(repository: BodyPartsRepository(apiService: APIService()))
+        return .init(productsUseCase: productsUseCase, bodyPartsUseCase: bodyPartsUseCase)
     }
 
     func fetchSolutions() async {
-        isLoadingSolutions = true
-        errorMessageSolutions = nil
-
         do {
             self.solutions = try await productsUseCase.execute()
         } catch {
-            errorMessageSolutions = error.localizedDescription
+            print(error.localizedDescription)
         }
-
-        isLoadingSolutions = false
+    }
+    
+    func fetchBodyParts() async {
+        do {
+            self.bodyParts = try await bodyPartsUseCase.execute()
+        } catch {
+            print(error.localizedDescription)
+        }
     }
 }
