@@ -9,9 +9,9 @@ import SwiftUI
 
 @MainActor
 class AuthViewModel: ObservableObject {
-    @Published var isAuthenticated = false
+    @Published var isAuthenticated = LoginManager.isLoggedIn
     @Published var errorMessage: String?
-
+    
     private let authUseCase: AuthUseCaseProtocol
 
     private init(authUseCase: AuthUseCaseProtocol) {

@@ -14,6 +14,7 @@ enum APIEndpoints {
     case uploadScan(userId: String, scanFile: Data, fileName: String)
     case getUserScans(userId: String)
     case getOrderStatus(orderId: String)
+    case getProductsSolutions
 }
 
 extension APIEndpoints: TargetType {
@@ -28,6 +29,7 @@ extension APIEndpoints: TargetType {
         case .uploadScan: return "/scan/upload"
         case .getUserScans(let userId): return "/scan/\(userId)"
         case .getOrderStatus(let orderId): return "/order/\(orderId)"
+        case .getProductsSolutions: return "/products/solutions"
         }
     }
     
@@ -35,7 +37,7 @@ extension APIEndpoints: TargetType {
         switch self {
         case .login, .register, .uploadScan:
             return .post
-        case .getUserScans, .getOrderStatus:
+        case .getUserScans, .getOrderStatus, .getProductsSolutions:
             return .get
         }
     }
@@ -55,7 +57,7 @@ extension APIEndpoints: TargetType {
             ]
             return .uploadMultipart(formData)
             
-        case .getUserScans, .getOrderStatus:
+        case .getUserScans, .getOrderStatus, .getProductsSolutions:
             return .requestPlain
         }
     }

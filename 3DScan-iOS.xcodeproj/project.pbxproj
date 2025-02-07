@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5E5E8CDE2D56592800D98151 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 5E5E8CDD2D56592800D98151 /* Lottie */; };
 		5ED94F712D538C35001FF58C /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 5ED94F702D538C35001FF58C /* Moya */; };
 		5ED94F742D538CC2001FF58C /* AWSACM in Frameworks */ = {isa = PBXBuildFile; productRef = 5ED94F732D538CC2001FF58C /* AWSACM */; };
 /* End PBXBuildFile section */
@@ -43,6 +44,7 @@
 			files = (
 				5ED94F742D538CC2001FF58C /* AWSACM in Frameworks */,
 				5ED94F712D538C35001FF58C /* Moya in Frameworks */,
+				5E5E8CDE2D56592800D98151 /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -87,6 +89,7 @@
 			packageProductDependencies = (
 				5ED94F702D538C35001FF58C /* Moya */,
 				5ED94F732D538CC2001FF58C /* AWSACM */,
+				5E5E8CDD2D56592800D98151 /* Lottie */,
 			);
 			productName = "HandScan-iOS";
 			productReference = 5ED94F562D538B16001FF58C /* 3DScan-iOS.app */;
@@ -119,6 +122,7 @@
 			packageReferences = (
 				5ED94F6F2D538C35001FF58C /* XCRemoteSwiftPackageReference "Moya" */,
 				5ED94F722D538CC2001FF58C /* XCRemoteSwiftPackageReference "aws-sdk-swift" */,
+				5E5E8CDC2D56592800D98151 /* XCRemoteSwiftPackageReference "lottie-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5ED94F572D538B16001FF58C /* Products */;
@@ -358,6 +362,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		5E5E8CDC2D56592800D98151 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.1;
+			};
+		};
 		5ED94F6F2D538C35001FF58C /* XCRemoteSwiftPackageReference "Moya" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Moya/Moya";
@@ -377,6 +389,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		5E5E8CDD2D56592800D98151 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5E5E8CDC2D56592800D98151 /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
+		};
 		5ED94F702D538C35001FF58C /* Moya */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 5ED94F6F2D538C35001FF58C /* XCRemoteSwiftPackageReference "Moya" */;

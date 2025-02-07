@@ -89,7 +89,7 @@ struct RegisterView: View {
                             showPasswordMismatch = true
                         }
                     }) {
-                        AppButtonText("Register", backgroundColor: .green)
+                        AppButtonText("Register", backgroundColor: .darkGray)
                     }
                     .padding(.horizontal, 30)
 

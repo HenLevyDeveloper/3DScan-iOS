@@ -11,7 +11,7 @@ struct AppButtonText: View {
     private let placeholder: String
     private let backgroundColor: Color
     
-    init(_ placeholder: String, backgroundColor: Color = .blue) {
+    init(_ placeholder: String, backgroundColor: Color = .mustard) {
         self.placeholder = placeholder
         self.backgroundColor = backgroundColor
     }
@@ -24,6 +24,10 @@ struct AppButtonText: View {
             .padding()
             .background(backgroundColor)
             .cornerRadius(10)
-            .shadow(radius: 3)
+            .shadow(radius: 2)
     }
+}
+
+#Preview {
+    AppButtonText("Title")
 }

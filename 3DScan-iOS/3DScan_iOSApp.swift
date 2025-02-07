@@ -11,7 +11,7 @@ import SwiftUI
 struct _3DScan_iOSApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            SplashView()
         }
     }
 }

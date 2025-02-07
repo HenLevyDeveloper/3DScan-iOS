@@ -10,7 +10,7 @@ import SwiftUI
 struct MainTabView: View {
     var body: some View {
         TabView {
-            HomeView().tabItem {
+            HomeView(viewModel: .create()).tabItem {
                 Label("Home", systemImage: "house")
             }
             ScanView().tabItem {
@@ -20,12 +20,6 @@ struct MainTabView: View {
                 Label("Profile", systemImage: "person")
             }
         }
-    }
-}
-
-struct HomeView: View {
-    var body: some View {
-        Text("Home")
     }
 }
 

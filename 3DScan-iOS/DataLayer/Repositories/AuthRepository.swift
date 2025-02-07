@@ -21,7 +21,11 @@ class AuthRepository: AuthRepositoryProtocol {
 
     func login(email: String, password: String) async throws -> User {
         let response = try await apiService.request(.login(email: email, password: password))
-        return try JSONDecoder().decode(User.self, from: response.data)
+        let user = try JSONDecoder().decode(User.self, from: response.data)
+        if let token = user.token {
+            PersistentManager.setAuthToken(token)
+        }
+        return user
     }
     
     func register(name: String, email: String, password: String) async throws -> User {

@@ -19,8 +19,8 @@ struct LoginView: View {
                 
                 ScrollView {
                     VStack(spacing: 20) {
-                        AppTitleIcon(iconSystemName: "cube", title: "HandScan")
-                        .padding(.bottom, 30)
+                        AppTitleIcon(iconSystemName: "cube", title: "Gero 3D")
+                            .padding(.bottom, 30)
                         
                         // Input Fields
                         VStack(spacing: 15) {
