@@ -1,5 +1,5 @@
 //
-//  HandCaptureService.swift
+//  CaptureService.swift
 //  3DScan-iOS
 //
 //  Created by Hen Levi on 07/02/2025.
@@ -12,7 +12,7 @@ import ARKit
 import ModelIO
 
 @MainActor
-class HandCaptureService: NSObject, ObservableObject {
+class CaptureService: NSObject, ObservableObject {
     private var capturedImages: [URL] = []
     private var session: PhotogrammetrySession?
 
@@ -20,14 +20,14 @@ class HandCaptureService: NSObject, ObservableObject {
     @Published var progress: Double = 0.0
     @Published var outputModelURL: URL?
 
-    // ✅ Start Capturing Process
+    // Start Capturing Process
     func startCapturing() {
         capturedImages.removeAll()
         isCapturing = true
         print("📸 Hand Capture Started")
     }
 
-    // ✅ Capture and Save an Image
+    // Capture and Save an Image
     func captureImage(from frame: ARFrame) {
         guard isCapturing else { return }
 
@@ -43,18 +43,18 @@ class HandCaptureService: NSObject, ObservableObject {
         }
     }
 
-    // ✅ Stop Capturing & Start Photogrammetry Processing
+    // Stop Capturing & Start Photogrammetry Processing
     func stopCapturing() {
         isCapturing = false
         print("📸 Stopped Capturing. Processing 3D Model...")
 
-        // ✅ Process images asynchronously
+        // Process images asynchronously
         Task {
             await processImagesTo3D()
         }
     }
 
-    // ✅ Save Image to Temp Directory
+    // Save Image to Temp Directory
     private func saveImage(_ pixelBuffer: CVPixelBuffer) -> URL? {
         let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
         let context = CIContext()
@@ -83,11 +83,11 @@ class HandCaptureService: NSObject, ObservableObject {
             let tempDirectory = FileManager.default.temporaryDirectory.appendingPathComponent("HandScanImages", isDirectory: true)
             let outputURL = FileManager.default.temporaryDirectory.appendingPathComponent("handModel.usdz")
 
-            // ✅ Ensure the folder exists
+            // Ensure the folder exists
             try? FileManager.default.removeItem(at: tempDirectory)
             try FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true, attributes: nil)
 
-            // ✅ Move all captured images to this folder
+            // Move all captured images to this folder
             for imageUrl in capturedImages {
                 if FileManager.default.fileExists(atPath: imageUrl.path) {
                     let destinationURL = tempDirectory.appendingPathComponent(imageUrl.lastPathComponent)
@@ -97,19 +97,19 @@ class HandCaptureService: NSObject, ObservableObject {
                 }
             }
 
-            // ✅ Ensure there are enough images
+            // Ensure there are enough images
             let validImages = try FileManager.default.contentsOfDirectory(at: tempDirectory, includingPropertiesForKeys: nil)
             if validImages.count < 50 {
                 print("❌ Not enough valid images! Need at least 50.")
                 return
             }
 
-            // ✅ Delete existing output file if it exists
+            // Delete existing output file if it exists
             if FileManager.default.fileExists(atPath: outputURL.path) {
                 try FileManager.default.removeItem(at: outputURL)
             }
 
-            // ✅ Create PhotogrammetrySession with the folder
+            // Create PhotogrammetrySession with the folder
             session = try PhotogrammetrySession(input: tempDirectory, configuration: .init())
 
             Task {
@@ -141,7 +141,7 @@ class HandCaptureService: NSObject, ObservableObject {
                 }
             }
 
-            // ✅ Process request
+            // Process request
             try session?.process(requests: [.modelFile(url: outputURL)])
 
         } catch {

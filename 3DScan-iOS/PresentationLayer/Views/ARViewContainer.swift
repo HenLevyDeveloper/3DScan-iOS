@@ -10,7 +10,7 @@ import ARKit
 import RealityKit
 
 struct ARViewController: UIViewControllerRepresentable {
-    let handCaptureService: HandCaptureService
+    let captureService: CaptureService
 
     func makeUIViewController(context: Context) -> UIViewController {
         let viewController = UIViewController()
@@ -23,20 +23,20 @@ struct ARViewController: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(handCaptureService: handCaptureService)
+        Coordinator(captureService: captureService)
     }
     
     class Coordinator: NSObject, ARSessionDelegate {
-        let handCaptureService: HandCaptureService
+        let captureService: CaptureService
 
-        init(handCaptureService: HandCaptureService) {
-            self.handCaptureService = handCaptureService
+        init(captureService: CaptureService) {
+            self.captureService = captureService
         }
 
         func session(_ session: ARSession, didUpdate frame: ARFrame) {
             Task {
                 await MainActor.run {
-                    handCaptureService.captureImage(from: frame)
+                    captureService.captureImage(from: frame)
                 }
             }
         }

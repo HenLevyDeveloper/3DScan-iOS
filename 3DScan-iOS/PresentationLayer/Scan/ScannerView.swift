@@ -10,30 +10,30 @@ import ARKit
 import RealityKit
 
 struct ScannerView: View {
-    @StateObject private var handCaptureService = HandCaptureService()
+    @StateObject private var captureService = CaptureService()
     private let arSession = ARSession()
 
     var body: some View {
         VStack {
-            ARViewController(handCaptureService: handCaptureService)
+            ARViewController(captureService: captureService)
                 .edgesIgnoringSafeArea(.all)
 
-            if handCaptureService.isCapturing {
-                ProgressView(value: handCaptureService.progress, total: 1.0)
+            if captureService.isCapturing {
+                ProgressView(value: captureService.progress, total: 1.0)
                     .padding()
             }
 
-            Button(handCaptureService.isCapturing ? "Stop Capture" : "Start Capture") {
-                if handCaptureService.isCapturing {
-                    handCaptureService.stopCapturing()
+            Button(captureService.isCapturing ? "Stop Capture" : "Start Capture") {
+                if captureService.isCapturing {
+                    captureService.stopCapturing()
                 } else {
-                    handCaptureService.startCapturing()
+                    captureService.startCapturing()
                 }
             }
             .buttonStyle(.borderedProminent)
             .padding()
 
-            if let modelURL = handCaptureService.outputModelURL {
+            if let modelURL = captureService.outputModelURL {
                 Text("3D Model Ready! 🎉")
                 Button("Export Model") {
                     shareModel(url: modelURL)

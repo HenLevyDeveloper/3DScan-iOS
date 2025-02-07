@@ -34,7 +34,7 @@ struct RegisterView: View {
                         focusedField = nil
                     }
                     
-                    // ✅ Input Fields (Now Supports Next Keyboard Navigation)
+                    // Input Fields (Now Supports Next Keyboard Navigation)
                     VStack(spacing: 15) {
                         TextField("Full Name", text: $name)
                             .textFieldStyle()
@@ -76,7 +76,7 @@ struct RegisterView: View {
                         focusedField = nil  // Dismiss keyboard when tapping outside
                     }
 
-                    // ✅ Register Button
+                    // Register Button
                     Button(action: {
                         if password == confirmPassword {
                             Task {
@@ -93,7 +93,7 @@ struct RegisterView: View {
                     }
                     .padding(.horizontal, 30)
 
-                    // ✅ Error Message
+                    // Error Message
                     if let error = authViewModel.errorMessage {
                         Text(error)
                             .foregroundColor(.red)
@@ -101,7 +101,7 @@ struct RegisterView: View {
                             .padding(.top, 5)
                     }
 
-                    // ✅ Already Have an Account? Go Back to Login
+                    // Already Have an Account? Go Back to Login
                     Button(action: {
                         dismiss()
                     }) {
