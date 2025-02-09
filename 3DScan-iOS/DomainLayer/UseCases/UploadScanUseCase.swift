@@ -8,17 +8,23 @@
 import Foundation
 
 protocol UploadScanUseCaseProtocol {
-    func execute(userId: String, scanFile: Data, fileName: String) async throws -> String
+    func generatePresignedUrl(userId: String, fileName: String) async throws -> PresignedURL
+    func uploadScan(_ fileURL: URL, presignedURL: URL) async throws -> Bool
 }
 
 class UploadScanUseCase: UploadScanUseCaseProtocol {
+    
     private let repository: ScanRepositoryProtocol
 
     init(repository: ScanRepositoryProtocol) {
         self.repository = repository
     }
 
-    func execute(userId: String, scanFile: Data, fileName: String) async throws -> String {
-        return try await repository.uploadScan(userId: userId, scanFile: scanFile, fileName: fileName)
+    func generatePresignedUrl(userId: String, fileName: String) async throws -> PresignedURL {
+        try await repository.generatePresignedUrl(userId: userId, fileName: fileName)
+    }
+    
+    func uploadScan(_ fileURL: URL, presignedURL: URL) async throws -> Bool {
+        try await repository.uploadScan(fileURL, presignedURL: presignedURL)
     }
 }

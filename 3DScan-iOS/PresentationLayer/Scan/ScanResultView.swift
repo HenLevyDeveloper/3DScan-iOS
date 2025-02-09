@@ -47,20 +47,6 @@ struct ScanResultView: View {
             }
             .padding(.horizontal)
         }
-        .overlay(alignment: .topTrailing) {
-            
-            // Close Button
-            Button(action: {
-                onClose()
-            }) {
-                Image(systemName: "xmark.circle.fill")
-                    .resizable()
-                    .frame(width: 32, height: 32)
-                    .foregroundColor(.white)
-                    .shadow(radius: 3)
-                    .padding()
-            }
-        }
     }
     
     private func shareModel() {

@@ -8,7 +8,9 @@
 import Foundation
 
 protocol ScanRepositoryProtocol {
-    func uploadScan(userId: String, scanFile: Data, fileName: String) async throws -> String
+    func generatePresignedUrl(userId: String, fileName: String) async throws -> PresignedURL
+    func getUserScans(userId: String) async throws -> [Scan]
+    func uploadScan(_ fileURL: URL, presignedURL: URL) async throws -> Bool
 }
 
 class ScanRepository: ScanRepositoryProtocol {
@@ -17,10 +19,19 @@ class ScanRepository: ScanRepositoryProtocol {
     init(apiService: APIService) {
         self.apiService = apiService
     }
-
-    func uploadScan(userId: String, scanFile: Data, fileName: String) async throws -> String {
-        let response = try await apiService.request(.uploadScan(userId: userId, scanFile: scanFile, fileName: fileName))
-        let json = try JSONDecoder().decode([String: String].self, from: response.data)
-        return json["scanUrl"] ?? ""
+    
+    func generatePresignedUrl(userId: String, fileName: String) async throws -> PresignedURL {
+        let response = try await apiService.request(.generateScanPresignedUrl(userId: userId, fileName: fileName))
+        return try JSONDecoder().decode(PresignedURL.self, from: response.data)
+    }
+    
+    func getUserScans(userId: String) async throws -> [Scan] {
+        let response = try await apiService.request(.getUserScans(userId: userId))
+        return try JSONDecoder().decode([Scan].self, from: response.data)
+    }
+    
+    func uploadScan(_ fileURL: URL, presignedURL: URL) async throws -> Bool {
+        let response = try await apiService.request(.upload(fileURL: fileURL, presignedURL: presignedURL))
+        return response.statusCode == 200
     }
 }

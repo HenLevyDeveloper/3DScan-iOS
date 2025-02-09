@@ -8,6 +8,7 @@
 struct Scan: Codable {
     let id: String
     let userId: String
-    let scanUrl: String
+    let key: String
+    let url: String
     let createdAt: String
 }

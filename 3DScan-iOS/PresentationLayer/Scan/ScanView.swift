@@ -25,7 +25,8 @@ struct ScanView: View {
                         }
                     }
             
-            case .proccesing(let progress):
+            case .proccesing(let progress),
+                    .uploading(let progress):
                 Color.black.opacity(0.5)
                     .edgesIgnoringSafeArea(.all)
                 
@@ -34,7 +35,7 @@ struct ScanView: View {
                         .frame(width: 120, height: 120)
                         .padding()
                     
-                    Text(progress < 0.5 ? "Proccesing scan..." : "Creating your 3D model...")
+                    Text(processingText(progress: progress))
                         .font(.headline)
                         .foregroundColor(.white)
                         .padding()
@@ -80,6 +81,14 @@ struct ScanView: View {
             .padding(.horizontal)
         }
         .padding(.bottom, 30)
+    }
+    
+    private func processingText(progress: Double) -> String {
+        switch progress {
+        case 0..<0.5: "Proccesing scan..."
+        case 0.5..<0.99: "Creating your 3D model..."
+        default: "Finishing up..."
+        }
     }
 }
 

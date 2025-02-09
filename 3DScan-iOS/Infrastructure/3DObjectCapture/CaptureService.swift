@@ -25,6 +25,7 @@ protocol CaptureServiceProtocol: NSObject {
     var modelProcessingPublisher: Published<Double>.Publisher { get }
     var outputModelURL: URL? { get }
     var isCapturing: Bool { get }
+    var fileName: String { get }
 }
 
 
@@ -36,6 +37,7 @@ class CaptureService: NSObject, ObservableObject, CaptureServiceProtocol {
     var modelProcessingPublisher: Published<Double>.Publisher { $modelProcessing }
     var outputModelURL: URL?
     var isCapturing = false
+    var fileName = "BodyPartModel.usdz"
     
     private var capturedImages: [URL] = []
     private var session: PhotogrammetrySession?
@@ -141,7 +143,7 @@ class CaptureService: NSObject, ObservableObject, CaptureServiceProtocol {
 
         do {
             let tempDirectory = FileManager.default.temporaryDirectory.appendingPathComponent("ScanImages", isDirectory: true)
-            let outputURL = FileManager.default.temporaryDirectory.appendingPathComponent("BodyPartModel.usdz")
+            let outputURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
 
             // Ensure the folder exists
             try? FileManager.default.removeItem(at: tempDirectory)

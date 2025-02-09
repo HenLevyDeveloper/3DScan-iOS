@@ -11,7 +11,8 @@ import Moya
 enum APIEndpoints {
     case login(email: String, password: String)
     case register(name: String, email: String, password: String)
-    case uploadScan(userId: String, scanFile: Data, fileName: String)
+    case upload(fileURL: URL, presignedURL: URL)
+    case generateScanPresignedUrl(userId: String, fileName: String)
     case getUserScans(userId: String)
     case getOrderStatus(orderId: String)
     case getProductsSolutions
@@ -20,15 +21,21 @@ enum APIEndpoints {
 
 extension APIEndpoints: TargetType {
     var baseURL: URL {
-        return URL(string: "http://ec2-23-22-29-22.compute-1.amazonaws.com:8080/api")!
+        switch self {
+        case .upload(_, let presignedURL):
+            return presignedURL
+        default:
+            return URL(string: "http://ec2-23-22-29-22.compute-1.amazonaws.com:8080/api")!
+        }
     }
     
     var path: String {
         switch self {
         case .login: return "/auth/login"
         case .register: return "/auth/register"
-        case .uploadScan: return "/scan/upload"
-        case .getUserScans(let userId): return "/scan/\(userId)"
+        case .upload: return ""
+        case .generateScanPresignedUrl: return "/scan/generate-presigned-url"
+        case .getUserScans(let userId): return "/scan/scans/\(userId)"
         case .getOrderStatus(let orderId): return "/order/\(orderId)"
         case .getProductsSolutions: return "/products/solutions"
         case .getBodyParts: return "/scan/body-parts"
@@ -37,10 +44,12 @@ extension APIEndpoints: TargetType {
     
     var method: Moya.Method {
         switch self {
-        case .login, .register, .uploadScan:
+        case .login, .register, .generateScanPresignedUrl:
             return .post
         case .getUserScans, .getOrderStatus, .getProductsSolutions, .getBodyParts:
             return .get
+        case .upload:
+            return .put
         }
     }
     
@@ -52,19 +61,28 @@ extension APIEndpoints: TargetType {
         case .register(let name, let email, let password):
             return .requestParameters(parameters: ["name": name, "email": email, "password": password], encoding: JSONEncoding.default)
             
-        case .uploadScan(let userId, let scanFile, let fileName):
-            let formData: [Moya.MultipartFormData] = [
-                .init(provider: .data(scanFile), name: "scan", fileName: fileName, mimeType: "model/vnd.usdz+zip"),
-                .init(provider: .data(userId.data(using: .utf8)!), name: "userId")
-            ]
-            return .uploadMultipart(formData)
+        case .generateScanPresignedUrl(let userId, let fileName):
+            return .requestParameters(parameters: ["userId": userId, "fileName": fileName], encoding: JSONEncoding.default)
             
         case .getUserScans, .getOrderStatus, .getProductsSolutions, .getBodyParts:
             return .requestPlain
+            
+        case .upload(let fileURL, _):
+            do {
+                let fileData = try Data(contentsOf: fileURL)
+                return .requestData(fileData)
+            } catch {
+                fatalError("Error reading file: \(error.localizedDescription)")
+            }
         }
     }
     
     var headers: [String: String]? {
-        return ["Content-Type": "application/json"]
+        switch self {
+        case .upload:
+            return ["Content-Type": "application/octet-stream"]
+        default:
+            return ["Content-Type": "application/json"]
+        }
     }
 }

@@ -14,6 +14,7 @@ class ScanViewModel: ObservableObject {
     enum ScanStatus: Equatable {
         case scanning,
              proccesing(progress: Double),
+             uploading(progress: Double),
              done(outputModelURL: URL?)
     }
     
@@ -70,11 +71,38 @@ class ScanViewModel: ObservableObject {
                 self.status = .proccesing(progress: progress)
                 
                 if progress >= 1.0, let outputModelURL = captureService.outputModelURL {
-                    self.status = .done(outputModelURL: outputModelURL)
                     self.modelProcessingCancellable?.cancel()
                     self.modelProcessingCancellable = nil
+                    
+                    self.status = .uploading(progress: progress)
+                    Task {
+                        await self.generatePresignedURL(outputModelURL: outputModelURL)
+                    }
                 }
             }
+    }
+    
+    private func generatePresignedURL(outputModelURL: URL) async {
+        do {
+            let presignedURL = try await uploadScanUseCase.generatePresignedUrl(userId: "67a4c07d8d7db26fb9e7324c",
+                                                                                fileName: captureService.fileName)
+            if let uploadURL = URL(string: presignedURL.uploadUrl) {
+                await uploadScan(outputModelURL: outputModelURL, uploadURL: uploadURL)
+            }
+        } catch {
+            print(error.localizedDescription)
+            self.status = .done(outputModelURL: outputModelURL)
+        }
+    }
+    
+    private func uploadScan(outputModelURL: URL, uploadURL: URL) async {
+        do {
+            _ = try await uploadScanUseCase.uploadScan(outputModelURL, presignedURL: uploadURL)
+            self.status = .done(outputModelURL: outputModelURL)
+        } catch {
+            print(error.localizedDescription)
+            self.status = .done(outputModelURL: outputModelURL)
+        }
     }
     
     func getCaptureService() -> CaptureServiceProtocol {
@@ -98,31 +126,4 @@ class ScanViewModel: ObservableObject {
         self.modelProcessingCancellable?.cancel()
         self.modelProcessingCancellable = nil
     }
-    
-//
-//    func setScanFile(_ fileURL: URL?) {
-//        guard let fileURL = fileURL else {
-//            self.uploadStatus = .failure("Scan failed")
-//            return
-//        }
-//        
-//        self.scanFileURL = fileURL
-//        self.uploadStatus = .ready(fileURL)
-//    }
-//
-//    func uploadScan() async {
-//        guard let scanFileURL = scanFileURL, let scanData = try? Data(contentsOf: scanFileURL) else {
-//            self.uploadStatus = .failure("No scan available")
-//            return
-//        }
-//
-//        self.uploadStatus = .uploading
-//
-//        do {
-//            let scanUrl = try await uploadScanUseCase.execute(userId: "USER_ID_HERE", scanFile: scanData, fileName: scanFileURL.lastPathComponent)
-//            self.uploadStatus = .success(scanUrl)
-//        } catch {
-//            self.uploadStatus = .failure(error.localizedDescription)
-//        }
-//    }
 }
