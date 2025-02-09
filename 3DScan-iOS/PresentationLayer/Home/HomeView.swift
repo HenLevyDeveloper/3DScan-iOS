@@ -20,11 +20,23 @@ struct HomeView: View {
                     // Solutions Paging Section
                     SolutionsPagingSectionView(solutions: viewModel.solutions)
                     
-                    Spacer()
+                    // Educational Section
+                    EducationalSectionView()
+                    
+                    Spacer(minLength: 16)
                 }
                 .task {
                     await viewModel.fetchSolutions()
                     await viewModel.fetchBodyParts()
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Image("Gero3DLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 40)
                 }
             }
         }
@@ -33,7 +45,7 @@ struct HomeView: View {
 }
 
 
-// Body Parts Section
+// MARK: - Body Parts Section
 struct BodyPartsSectionView: View {
     let bodyParts: [BodyPart]
     
@@ -88,7 +100,7 @@ struct BodyPartsSectionView: View {
 }
 
 
-// Solutions Horizontal Paging Section
+// MARK: - Solutions Horizontal Paging Section
 struct SolutionsPagingSectionView: View {
     let solutions: [ProductSolution]
     
@@ -128,7 +140,7 @@ struct SolutionsPagingSectionView: View {
     }
 }
 
-// Solution Item View
+// MARK: - Solution Item View
 struct ProductSolutionItemView: View {
     let productSolution: ProductSolution
     private let size = CGSize(width: UIScreen.main.bounds.width - 32, height: 250)
@@ -168,6 +180,37 @@ struct ProductSolutionItemView: View {
     }
 }
 
+
+// MARK: - Educational Section View
+struct EducationalSectionView: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Did You Know?")
+                .font(.title2)
+                .bold()
+                .padding(.leading)
+            
+            HStack(spacing: 16) {
+                Image(systemName: "lightbulb.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 50, height: 50)
+                    .foregroundColor(.yellow)
+                
+                Text("3D scanning can improve the precision of prosthetics and orthopedic solutions, ensuring a perfect fit for every patient.")
+                    .font(.body)
+                    .foregroundColor(.gray)
+                    .padding(.trailing)
+            }
+            .padding()
+            .background(Color.white)
+            .cornerRadius(10)
+            .shadow(radius: 4)
+            .padding(.horizontal)
+        }
+        .padding(.top)
+    }
+}
 
 #Preview {
     HomeView(viewModel: HomeViewModel.create())

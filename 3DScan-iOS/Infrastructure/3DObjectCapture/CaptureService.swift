@@ -10,48 +10,108 @@ import RealityKit
 import Photos
 import ARKit
 import ModelIO
+import Combine
 
 @MainActor
-class CaptureService: NSObject, ObservableObject {
+protocol CaptureServiceProtocol: NSObject {
+    func startCapturing()
+    func stopCapturing()
+    func resetCapturing()
+    func captureImage(from frame: ARFrame)
+    
+    var scanCompletion: Double { get }
+    var scanCompletionPublisher: Published<Double>.Publisher { get }
+    var modelProcessing: Double { get }
+    var modelProcessingPublisher: Published<Double>.Publisher { get }
+    var outputModelURL: URL? { get }
+    var isCapturing: Bool { get }
+}
+
+
+class CaptureService: NSObject, ObservableObject, CaptureServiceProtocol {
+    @Published var scanCompletion: Double = 0.0 // Percentage of scan coverage
+    @Published var modelProcessing: Double = 0.0 // Percentage of 3D Model processing progress
+    
+    var scanCompletionPublisher: Published<Double>.Publisher { $scanCompletion }
+    var modelProcessingPublisher: Published<Double>.Publisher { $modelProcessing }
+    var outputModelURL: URL?
+    var isCapturing = false
+    
     private var capturedImages: [URL] = []
     private var session: PhotogrammetrySession?
-
-    @Published var isCapturing = false
-    @Published var progress: Double = 0.0
-    @Published var outputModelURL: URL?
-
+    private var lastPosition: SIMD4<Float> = SIMD4<Float>(0, 0, 0, 1)
+    private var scannedAngles: Set<String> = []
+    
+    
     // Start Capturing Process
     func startCapturing() {
         capturedImages.removeAll()
         isCapturing = true
+        scanCompletion = 0.0
+        modelProcessing = 0.0
+        outputModelURL = nil
         print("📸 Hand Capture Started")
     }
 
     // Capture and Save an Image
     func captureImage(from frame: ARFrame) {
         guard isCapturing else { return }
-
+        
+        // I don't want to capture another image unless you moved more
+        let cameraPosition = frame.camera.transform.columns.3
+        let distanceMoved = sqrt(pow(cameraPosition.x - lastPosition.x, 2) +
+                                 pow(cameraPosition.y - lastPosition.y, 2) +
+                                 pow(cameraPosition.z - lastPosition.z, 2))
+        
+        guard distanceMoved > 0.05 else { // 5cm movement threshold
+            print("Move around the object to improve scan quality!")
+            return
+        }
+        
+        // Saving the captured image so later on I can create a 3D model from it
         let imageURL = saveImage(frame.capturedImage)
         if let imageURL = imageURL {
             capturedImages.append(imageURL)
             print("✅ Image Captured: \(imageURL.lastPathComponent)")
+        }
+        
+        // Save the covered angles until reach the target
+        let cameraTransform = frame.camera.transform
+        let rotation = cameraTransform.columns.2
+        let angleKey = String(format: "%.1f,%.1f,%.1f", rotation.x, rotation.y, rotation.z)
+        
+        if !scannedAngles.contains(angleKey) {
+            scannedAngles.insert(angleKey)
+            scanCompletion = Double(scannedAngles.count) / 30.0 // Assume 30 different views needed
+        }
+        
+        print("Scanned \(scannedAngles.count)/30 unique angles. Completion: \(scanCompletion * 100)%")
+        
+        lastPosition = cameraPosition
 
-            // Stop capturing after 50 images
-            if capturedImages.count >= 50 {
-                stopCapturing()
-            }
+        if scanCompletion >= 1.0 {
+            stopCapturing()
         }
     }
 
     // Stop Capturing & Start Photogrammetry Processing
     func stopCapturing() {
         isCapturing = false
+        scanCompletion = 1.0
+        
         print("📸 Stopped Capturing. Processing 3D Model...")
 
         // Process images asynchronously
         Task {
             await processImagesTo3D()
         }
+    }
+    
+    func resetCapturing() {
+        isCapturing = false
+        scanCompletion = 0.0
+        modelProcessing = 0.0
+        outputModelURL = nil
     }
 
     // Save Image to Temp Directory
@@ -80,8 +140,8 @@ class CaptureService: NSObject, ObservableObject {
         }
 
         do {
-            let tempDirectory = FileManager.default.temporaryDirectory.appendingPathComponent("HandScanImages", isDirectory: true)
-            let outputURL = FileManager.default.temporaryDirectory.appendingPathComponent("handModel.usdz")
+            let tempDirectory = FileManager.default.temporaryDirectory.appendingPathComponent("ScanImages", isDirectory: true)
+            let outputURL = FileManager.default.temporaryDirectory.appendingPathComponent("BodyPartModel.usdz")
 
             // Ensure the folder exists
             try? FileManager.default.removeItem(at: tempDirectory)
@@ -96,14 +156,7 @@ class CaptureService: NSObject, ObservableObject {
                     print("⚠️ Warning: Skipping invalid image - \(imageUrl)")
                 }
             }
-
-            // Ensure there are enough images
-            let validImages = try FileManager.default.contentsOfDirectory(at: tempDirectory, includingPropertiesForKeys: nil)
-            if validImages.count < 50 {
-                print("❌ Not enough valid images! Need at least 50.")
-                return
-            }
-
+            
             // Delete existing output file if it exists
             if FileManager.default.fileExists(atPath: outputURL.path) {
                 try FileManager.default.removeItem(at: outputURL)
@@ -119,6 +172,7 @@ class CaptureService: NSObject, ObservableObject {
                         print("🎉 Processing Complete!")
                         await MainActor.run {
                             self.outputModelURL = outputURL
+                            self.modelProcessing = 1.0
                         }
 
                     case .requestError(let request, let error):
@@ -131,8 +185,8 @@ class CaptureService: NSObject, ObservableObject {
 
                     case .requestProgress(_, let fractionComplete):
                         await MainActor.run {
-                            self.progress = fractionComplete
-                            print("⏳ Progress: \(self.progress * 100)%")
+                            self.modelProcessing = fractionComplete
+                            print("⏳ Progress: \(self.modelProcessing * 100)%")
                         }
 
                     default:

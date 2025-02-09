@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "Gero3DLogo.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

@@ -62,7 +62,7 @@ struct DetailView: View {
             .navigationTitle("\(title) Details")
             .navigationBarTitleDisplayMode(.inline)
             .fullScreenCover(isPresented: $showScanScreen) {
-                ScannerView()
+                ScanView(viewModel: .create())
             }
         }
     }

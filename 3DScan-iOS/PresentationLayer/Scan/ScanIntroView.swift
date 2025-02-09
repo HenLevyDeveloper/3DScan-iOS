@@ -15,22 +15,8 @@ struct ScanIntroView: View {
         VStack(spacing: 20) {
             Spacer()
             
-            // 3D-like Illustration Placeholder
-            Image(systemName: "viewfinder.circle")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 120, height: 120)
-                .foregroundStyle(LinearGradient(
-                    gradient: Gradient(colors: [Color.lightGreen, Color.darkGray]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ))
-                .shadow(radius: 10)
-                .rotation3DEffect(
-                    .degrees(10),
-                    axis: (x: 0, y: 1, z: 0)
-                )
-                .animation(Animation.easeInOut(duration: 1.5).repeatForever(), value: true)
+            // 'Scan' animation
+            ScanAnimatedView()
                 
             Text("Scan Your Body in 3D")
                 .font(.largeTitle)
@@ -65,6 +51,35 @@ struct ScanIntroView: View {
             
             Spacer()
         }
+        .fullScreenCover(isPresented: $showScanScreen) {
+            ScanView(viewModel: .create())
+        }
+    }
+}
+
+struct ScanAnimatedView: View {
+    @State private var isAnimating = false
+
+    var body: some View {
+        Image(systemName: "viewfinder.circle")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 120, height: 120)
+            .foregroundStyle(LinearGradient(
+                gradient: Gradient(colors: [Color.green, Color.gray]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ))
+            .shadow(radius: 10)
+            .rotation3DEffect(
+                .degrees(isAnimating ? 10 : -10),
+                axis: (x: 0, y: 1, z: 0)
+            )
+            .onAppear {
+                withAnimation(Animation.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                    isAnimating.toggle()
+                }
+            }
     }
 }
 

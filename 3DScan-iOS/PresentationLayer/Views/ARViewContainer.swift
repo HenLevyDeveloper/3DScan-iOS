@@ -10,7 +10,7 @@ import ARKit
 import RealityKit
 
 struct ARViewController: UIViewControllerRepresentable {
-    let captureService: CaptureService
+    let captureService: CaptureServiceProtocol
 
     func makeUIViewController(context: Context) -> UIViewController {
         let viewController = UIViewController()
@@ -27,9 +27,9 @@ struct ARViewController: UIViewControllerRepresentable {
     }
     
     class Coordinator: NSObject, ARSessionDelegate {
-        let captureService: CaptureService
-
-        init(captureService: CaptureService) {
+        let captureService: CaptureServiceProtocol
+        
+        init(captureService: CaptureServiceProtocol) {
             self.captureService = captureService
         }
 

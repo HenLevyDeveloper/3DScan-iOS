@@ -25,7 +25,7 @@ struct MainTabView: View {
     var body: some View {
         TabView {
             HomeView(viewModel: .create()).tabItem {
-                Label("Solutions", systemImage: "apple.meditate")
+                Label("Solutions", systemImage: "sun.max")
             }
             ScanIntroView().tabItem {
                 Label("Scan", systemImage: "viewfinder")
