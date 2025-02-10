@@ -9,4 +9,10 @@ class LoginManager {
     static var isLoggedIn: Bool {
         PersistentManager.getAuthToken() != nil
     }
+    static var userID: String {
+        PersistentManager.getUserID() ?? ""
+    }
+    static var username: String {
+        PersistentManager.getUserName() ?? ""
+    }
 }

@@ -14,10 +14,9 @@ struct RegisterView: View {
     @State private var password = ""
     @State private var confirmPassword = ""
     @State private var showPasswordMismatch = false
-    @FocusState private var focusedField: Field? // Track current field
+    @FocusState private var focusedField: Field?
     @Environment(\.dismiss) var dismiss
-
-    // Enum to track focused field
+    
     enum Field {
         case name, email, password, confirmPassword
     }
@@ -34,7 +33,7 @@ struct RegisterView: View {
                         focusedField = nil
                     }
                     
-                    // Input Fields (Now Supports Next Keyboard Navigation)
+                    // Input Fields
                     VStack(spacing: 15) {
                         TextField("Full Name", text: $name)
                             .textFieldStyle()
@@ -115,7 +114,7 @@ struct RegisterView: View {
                 }
                 .padding(.top, 20)
                 .onTapGesture {
-                    focusedField = nil  // Dismiss keyboard when tapping outside
+                    focusedField = nil
                 }
             }
             .navigationTitle("")

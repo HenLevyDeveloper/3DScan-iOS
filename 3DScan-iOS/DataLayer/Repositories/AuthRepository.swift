@@ -25,6 +25,8 @@ class AuthRepository: AuthRepositoryProtocol {
         if let token = user.token {
             PersistentManager.setAuthToken(token)
         }
+        PersistentManager.setUserID(user.id)
+        PersistentManager.setUserName(user.name)
         return user
     }
     

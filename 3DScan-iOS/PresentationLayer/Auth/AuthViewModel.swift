@@ -9,13 +9,14 @@ import SwiftUI
 
 @MainActor
 class AuthViewModel: ObservableObject {
-    @Published var isAuthenticated = LoginManager.isLoggedIn
+    @Published var isAuthenticated: Bool
     @Published var errorMessage: String?
     
     private let authUseCase: AuthUseCaseProtocol
 
-    private init(authUseCase: AuthUseCaseProtocol) {
+    private init(authUseCase: AuthUseCaseProtocol, isAuthenticated: Bool) {
         self.authUseCase = authUseCase
+        self.isAuthenticated = isAuthenticated
     }
 
     /// factory method for safe initialization
@@ -23,7 +24,7 @@ class AuthViewModel: ObservableObject {
         let apiService = APIService()
         let repository = AuthRepository(apiService: apiService)
         let useCase = AuthUseCase(repository: repository)
-        return AuthViewModel(authUseCase: useCase)
+        return AuthViewModel(authUseCase: useCase, isAuthenticated: LoginManager.isLoggedIn)
     }
 
     func login(email: String, password: String) async {

@@ -10,7 +10,8 @@
 import Foundation
 
 protocol GetUserScansUseCaseProtocol {
-    func execute(userId: String) async throws -> [Scan]
+    func getUserScan(userId: String) async throws -> [Scan]
+    func getViewPresignedURL(userId: String, fileKey: String) async throws -> URL
 }
 
 class GetUserScansUseCase: GetUserScansUseCaseProtocol {
@@ -20,7 +21,11 @@ class GetUserScansUseCase: GetUserScansUseCaseProtocol {
         self.repository = repository
     }
 
-    func execute(userId: String) async throws -> [Scan] {
+    func getUserScan(userId: String) async throws -> [Scan] {
         try await repository.getUserScans(userId: userId)
+    }
+    
+    func getViewPresignedURL(userId: String, fileKey: String) async throws -> URL {
+        try await repository.getViewPresignedURL(userId: userId, fileKey: fileKey)
     }
 }

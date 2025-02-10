@@ -11,6 +11,7 @@ protocol ScanRepositoryProtocol {
     func generatePresignedUrl(userId: String, fileName: String) async throws -> PresignedURL
     func getUserScans(userId: String) async throws -> [Scan]
     func uploadScan(_ fileURL: URL, presignedURL: URL) async throws -> Bool
+    func getViewPresignedURL(userId: String, fileKey: String) async throws -> URL
 }
 
 class ScanRepository: ScanRepositoryProtocol {
@@ -33,5 +34,11 @@ class ScanRepository: ScanRepositoryProtocol {
     func uploadScan(_ fileURL: URL, presignedURL: URL) async throws -> Bool {
         let response = try await apiService.request(.upload(fileURL: fileURL, presignedURL: presignedURL))
         return response.statusCode == 200
+    }
+    
+    func getViewPresignedURL(userId: String, fileKey: String) async throws -> URL {
+        let response = try await apiService.request(.getViewPresignedURL(userId: userId, fileKey: fileKey))
+        let viewPresignedUrl = try JSONDecoder().decode(ViewPresignedURL.self, from: response.data)
+        return viewPresignedUrl.presignedUrl
     }
 }

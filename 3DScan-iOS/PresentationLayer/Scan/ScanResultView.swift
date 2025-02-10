@@ -24,7 +24,7 @@ struct ScanResultView: View {
             
             if let modelURL = modelURL {
                 VStack {
-                    ModelViewerView(modelURL: modelURL)
+                    ModelViewerView(viewModel: .create(withLocalFileURL: modelURL))
                         .frame(height: 400)
                         .background(Color.black.opacity(0.3))
                         .cornerRadius(12)

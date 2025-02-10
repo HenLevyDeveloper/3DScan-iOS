@@ -30,7 +30,7 @@ struct MainTabView: View {
             ScanIntroView().tabItem {
                 Label("Scan", systemImage: "viewfinder")
             }
-            ProfileView().tabItem {
+            ProfileView(viewModel: .create()).tabItem {
                 Label("Me", systemImage: "person")
             }
         }

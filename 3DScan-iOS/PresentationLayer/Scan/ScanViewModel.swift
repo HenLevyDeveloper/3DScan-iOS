@@ -28,11 +28,14 @@ class ScanViewModel: ObservableObject {
     
     private let uploadScanUseCase: UploadScanUseCaseProtocol
     private let captureService: CaptureServiceProtocol
+    private let userId: String
     
     init(uploadScanUseCase: UploadScanUseCaseProtocol,
-         captureService: CaptureServiceProtocol) {
+         captureService: CaptureServiceProtocol,
+         userId: String) {
         self.uploadScanUseCase = uploadScanUseCase
         self.captureService = captureService
+        self.userId = userId
         
         subscribeToScanCompletion()
     }
@@ -41,8 +44,10 @@ class ScanViewModel: ObservableObject {
     static func create() -> ScanViewModel {
         let repository = ScanRepository(apiService: APIService())
         let useCase = UploadScanUseCase(repository: repository)
+        
         return .init(uploadScanUseCase: useCase,
-                     captureService: CaptureService())
+                     captureService: CaptureService(),
+                     userId: LoginManager.userID)
     }
     
     private func subscribeToScanCompletion() {
@@ -84,7 +89,7 @@ class ScanViewModel: ObservableObject {
     
     private func generatePresignedURL(outputModelURL: URL) async {
         do {
-            let presignedURL = try await uploadScanUseCase.generatePresignedUrl(userId: "67a4c07d8d7db26fb9e7324c",
+            let presignedURL = try await uploadScanUseCase.generatePresignedUrl(userId: userId,
                                                                                 fileName: captureService.fileName)
             if let uploadURL = URL(string: presignedURL.uploadUrl) {
                 await uploadScan(outputModelURL: outputModelURL, uploadURL: uploadURL)

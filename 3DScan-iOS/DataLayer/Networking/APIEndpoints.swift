@@ -13,6 +13,7 @@ enum APIEndpoints {
     case register(name: String, email: String, password: String)
     case upload(fileURL: URL, presignedURL: URL)
     case generateScanPresignedUrl(userId: String, fileName: String)
+    case getViewPresignedURL(userId: String, fileKey: String)
     case getUserScans(userId: String)
     case getOrderStatus(orderId: String)
     case getProductsSolutions
@@ -35,6 +36,7 @@ extension APIEndpoints: TargetType {
         case .register: return "/auth/register"
         case .upload: return ""
         case .generateScanPresignedUrl: return "/scan/generate-presigned-url"
+        case .getViewPresignedURL(let userId, let fileKey): return "/scan/scans/\(userId)/presigned-url/\(fileKey)"
         case .getUserScans(let userId): return "/scan/scans/\(userId)"
         case .getOrderStatus(let orderId): return "/order/\(orderId)"
         case .getProductsSolutions: return "/products/solutions"
@@ -46,7 +48,7 @@ extension APIEndpoints: TargetType {
         switch self {
         case .login, .register, .generateScanPresignedUrl:
             return .post
-        case .getUserScans, .getOrderStatus, .getProductsSolutions, .getBodyParts:
+        case .getUserScans, .getOrderStatus, .getProductsSolutions, .getBodyParts, .getViewPresignedURL:
             return .get
         case .upload:
             return .put
@@ -64,7 +66,7 @@ extension APIEndpoints: TargetType {
         case .generateScanPresignedUrl(let userId, let fileName):
             return .requestParameters(parameters: ["userId": userId, "fileName": fileName], encoding: JSONEncoding.default)
             
-        case .getUserScans, .getOrderStatus, .getProductsSolutions, .getBodyParts:
+        case .getUserScans, .getOrderStatus, .getProductsSolutions, .getBodyParts, .getViewPresignedURL:
             return .requestPlain
             
         case .upload(let fileURL, _):
