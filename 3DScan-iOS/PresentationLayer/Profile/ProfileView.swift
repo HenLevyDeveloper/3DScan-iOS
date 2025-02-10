@@ -30,7 +30,8 @@ struct ProfileView: View {
                 
                 // User Scans List
                 List(viewModel.scans) { scan in
-                    NavigationLink(destination: ScanDetailView(scan: scan)) {
+                    NavigationLink(destination: ScanDetailView(scan: scan,
+                                                               modelViewerViewModel: .create(withExternalFileKey: scan.key, userId: scan.userId))) {
                         HStack {
                             Image(systemName: "cube.box.fill")
                                 .resizable()
@@ -60,6 +61,7 @@ struct ProfileView: View {
 
 struct ScanDetailView: View {
     let scan: Scan
+    @ObservedObject var modelViewerViewModel: ModelViewerViewModel
     
     var body: some View {
         VStack(spacing: 20) {
@@ -73,25 +75,27 @@ struct ScanDetailView: View {
                 .foregroundColor(.lightBlue)
             
             VStack {
-                ModelViewerView(viewModel: .create(withExternalFileKey: scan.key, userId: scan.userId))
+                ModelViewerView(viewModel: modelViewerViewModel)
                     .frame(height: 300)
                     .background(Color.black.opacity(0.3))
                     .cornerRadius(12)
             }
             
             // Share Scan Button
-            Button {
-                shareScan(scan)
-            } label: {
-                AppButtonText("Share Scan")
+            if let localFileURL = modelViewerViewModel.localFileURL {
+                Button {
+                    shareScan(localFileURL)
+                } label: {
+                    AppButtonText("Share Scan")
+                }
+                .padding(.horizontal)
             }
-            .padding(.horizontal)
         }
         .padding()
     }
     
-    func shareScan(_ scan: Scan) {
-        let activityVC = UIActivityViewController(activityItems: [scan.url], applicationActivities: nil)
+    func shareScan(_ localFileURL: URL) {
+        let activityVC = UIActivityViewController(activityItems: [localFileURL], applicationActivities: nil)
         if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let window = scene.windows.first,
            let target = window.rootViewController {
