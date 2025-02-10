@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MainView: View {
-    @StateObject private var authViewModel = AuthViewModel.create()
+    @StateObject var authViewModel: AuthViewModel
 
     var body: some View {
         if authViewModel.isAuthenticated {
@@ -21,5 +21,5 @@ struct MainView: View {
 
 
 #Preview {
-    MainView()
+    MainView(authViewModel: .create())
 }

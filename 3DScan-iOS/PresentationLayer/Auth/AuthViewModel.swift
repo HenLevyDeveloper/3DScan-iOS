@@ -11,6 +11,7 @@ import SwiftUI
 class AuthViewModel: ObservableObject {
     @Published var isAuthenticated: Bool
     @Published var errorMessage: String?
+    @Published var isLoggingIn = false
     
     private let authUseCase: AuthUseCaseProtocol
 
@@ -28,11 +29,14 @@ class AuthViewModel: ObservableObject {
     }
 
     func login(email: String, password: String) async {
+        isLoggingIn = true
+        
         do {
             _ = try await authUseCase.login(email: email, password: password)
             self.isAuthenticated = true
         } catch {
             self.errorMessage = error.localizedDescription
+            self.isLoggingIn = false
         }
     }
     

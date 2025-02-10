@@ -14,7 +14,7 @@ struct SplashView: View {
         ZStack {
             if isActive {
                 // Navigate to the main content view after the splash screen
-                MainView()
+                MainView(authViewModel: .create())
             } else {
                 // Splash screen with animation
                 AnimationView(animation: .splash)

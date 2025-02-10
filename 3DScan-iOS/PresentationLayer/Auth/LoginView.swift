@@ -27,21 +27,27 @@ struct LoginView: View {
                             TextField("Email", text: $email)
                                 .textFieldStyle()
                                 .textInputAutocapitalization(.never)
+                                .textContentType(.oneTimeCode)
                             
                             SecureField("Password", text: $password)
                                 .textFieldStyle()
+                                .textContentType(.oneTimeCode)
                         }
                         .padding(.horizontal, 30)
                         
-                        // Login Button
-                        Button(action: {
-                            Task {
-                                await authViewModel.login(email: email, password: password)
+                        if authViewModel.isLoggingIn {
+                            ProgressView()
+                        } else {
+                            // Login Button
+                            Button(action: {
+                                Task {
+                                    await authViewModel.login(email: email, password: password)
+                                }
+                            }) {
+                                AppButtonText("Login")
                             }
-                        }) {
-                            AppButtonText("Login")
+                            .padding(.horizontal, 30)
                         }
-                        .padding(.horizontal, 30)
                         
                         // Error Message
                         if let error = authViewModel.errorMessage {
